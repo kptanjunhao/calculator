@@ -132,14 +132,52 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func numTap(sender:UITapGestureRecognizer){
         if sender.view!.tag != -1{
             numTF.text! += "\(sender.view!.tag)"
+            self.addComma()
+            
+            
         }else{
-            numTF.text! += "."
+            if !numTF.text!.characters.contains("."){
+                numTF.text! += "."
+            }
+        }
+    }
+    
+    func addComma(){
+        //防止最后一位是小数点时调用
+        if numTF.text!.characters.last != "." && numTF.text!.characters.count != 0{
+            //将整数与小数部分分隔开
+            let resultfarr = numTF.text!.characters.split(".")
+            var afterpoint = ""
+            if resultfarr.count > 1{
+                afterpoint = "." + String(resultfarr[1])
+                numTF.text = String(resultfarr[0])
+            }
+            //移除先前添加的逗号再计算
+            numTF.text =  numTF.text!.stringByReplacingOccurrencesOfString(",", withString: "")
+            //数字超3位再开始添加以防在第一位直接添加逗号
+            if numTF.text!.characters.count > 3{
+                //3位循环向数字中插入逗号
+                let price = (numTF.text!.characters.count-1)/3
+                for i in 1...price{
+                    if i != 1{
+                        numTF.text!.insert(",", atIndex: numTF.text!.characters.endIndex.advancedBy(1 - 4 * i))
+                    }else{
+                        numTF.text!.insert(",", atIndex: numTF.text!.characters.endIndex.advancedBy(-3))
+                        
+                    }
+                }
+            }
+            //整合整数部分与小数部分
+            numTF.text = numTF.text! + afterpoint
         }
     }
     
     func addNumToTemp(sender:UIButton){
         var num = Double()
-        if let tempnum = Double.init(numTF.text!){
+        if numTF.text?.characters.last == "."{
+            numTF.text = String(numTF.text?.characters.dropLast())
+        }
+        if let tempnum = Double(numTF.text!.stringByReplacingOccurrencesOfString(",", withString: "")){
             num = tempnum
         }else{
             if tempArray.count != 0{
@@ -247,6 +285,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }else{
             numTF.text = "\(tempArray[0])"
+            self.addComma()
             lastNumTF.text = ""
             symbolTF.text = ""
             tempArray.removeLastObject()
