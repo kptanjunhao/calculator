@@ -15,7 +15,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     var numTF: UITextField!
     var symbolTF: UITextField!
-    var lastNumTF: UITextField!
+    var lastNumLabel: UILabel!
     
     var tempArray: NSMutableArray!
     var symbolArray: NSMutableArray!
@@ -36,10 +36,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         symbolTF = UITextField(frame: CGRectMake(150,50,200,30))
         symbolTF.textAlignment = .Right
         self.view.addSubview(symbolTF)
-        lastNumTF = UITextField(frame: CGRectMake(150,30,200,30))
-        lastNumTF.placeholder = "0"
-        lastNumTF.textAlignment = .Right
-        self.view.addSubview(lastNumTF)
+        lastNumLabel = UILabel(frame: CGRectMake(150,30,200,30))
+        lastNumLabel.textAlignment = .Right
+        lastNumLabel.lineBreakMode = NSLineBreakMode.ByTruncatingHead
+        self.view.addSubview(lastNumLabel)
         tempArray = NSMutableArray()
         symbolArray = NSMutableArray()
         
@@ -190,9 +190,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         symbolArray.addObject(sender.tag)
         self.showSymbol(sender.tag)
         
-        lastNumTF.placeholder = numTF.text
         numTF.placeholder = "0"
         numTF.text = nil
+        showCalcEquation()
+    }
+    
+    func showCalcEquation(){
+        lastNumLabel.text = ""
+        for i in 0..<symbolArray.count{
+            var symbol = ""
+            switch symbolArray[i].integerValue{
+            case 3:symbol = "➕"
+            case 2:symbol = "➖"
+            case 1:symbol = "✖️"
+            case 0:symbol = "➗"
+            default:symbol = ""
+            }
+            lastNumLabel.text! += "\(tempArray[i])\(i != symbolArray.count-1 ? symbol : "")"
+        }
     }
     
     func showMSG(){
@@ -254,6 +269,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                         continue
                     }
                     self.showMSG()
+                    break
                 }
                 calc()
             }else{
@@ -284,11 +300,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 calc()
             }
         }else{
-            numTF.text = "\(tempArray[0])"
+            let result = tempArray[0]
+            numTF.text = "\(result)"
             self.addComma()
-            lastNumTF.text = ""
+            lastNumLabel.text = ""
             symbolTF.text = ""
-            tempArray.removeLastObject()
+            tempArray.removeAllObjects()
         }
     }
     
