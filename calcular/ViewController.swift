@@ -23,27 +23,45 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     override func viewDidLoad() {
         super.viewDidLoad()
         tableViewData = NSMutableArray()
-        
-        
-        let tableViewFrame = CGRectMake(0, 20, 150, self.view.frame.height)
+        let show = UISwipeGestureRecognizer(target: self, action: #selector(self.showTableView(_:)))
+        show.direction = UISwipeGestureRecognizerDirection.Right
+        let close = UISwipeGestureRecognizer(target: self, action: #selector(self.closeTableView(_:)))
+        close.direction = UISwipeGestureRecognizerDirection.Left
+        self.view.addGestureRecognizer(show)
+        self.view.addGestureRecognizer(close)
+        let tableViewFrame = CGRectMake(-150, 20, 150, self.view.frame.height)
         tableView = UITableView(frame: tableViewFrame, style: UITableViewStyle.Plain)
+        tableView.delegate = self
+        tableView.backgroundColor = UIColor.whiteColor()
         tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-        self.view.addSubview(tableView)
-        numTF = UITextField(frame: CGRectMake(150,70,200,30))
+        numTF = UITextField(frame: CGRectMake(20,70,self.view.frame.width-40,30))
         numTF.placeholder = "0"
         numTF.textAlignment = .Right
         self.view.addSubview(numTF)
-        symbolTF = UITextField(frame: CGRectMake(150,50,200,30))
+        symbolTF = UITextField(frame: CGRectMake(20,50,self.view.frame.width-40,30))
         symbolTF.textAlignment = .Right
         self.view.addSubview(symbolTF)
-        lastNumLabel = UILabel(frame: CGRectMake(150,30,200,30))
+        lastNumLabel = UILabel(frame: CGRectMake(20,30,self.view.frame.width-40,30))
         lastNumLabel.textAlignment = .Right
         lastNumLabel.lineBreakMode = NSLineBreakMode.ByTruncatingHead
         self.view.addSubview(lastNumLabel)
         tempArray = NSMutableArray()
         symbolArray = NSMutableArray()
         
-        addKeyboard(CGRectMake(150, 100, 200, 400))
+        addKeyboard(CGRectMake(20, 100, self.view.frame.width-40, self.view.frame.height-200))
+        self.view.addSubview(tableView)
+    }
+    
+    func showTableView(sender:UISwipeGestureRecognizer){
+        UIView.animateWithDuration(0.2) { 
+            self.tableView.frame.origin.x = 0
+        }
+    }
+    
+    func closeTableView(sender:UISwipeGestureRecognizer){
+        UIView.animateWithDuration(0.2) {
+            self.tableView.frame.origin.x = -self.tableView.frame.width
+        }
     }
     
     func addKeyboard(keyboardFrame:CGRect){
@@ -70,7 +88,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // 0的视图添加
         let cur0X: CGFloat = 1
         let cur0Y = 1 + 3 * btnHeight
-        let num0ViewFrame = CGRectMake(cur0X, cur0Y, btnWidth - 1, btnHeight - 1)
+        let num0ViewFrame = CGRectMake(cur0X, cur0Y, btnWidth - 1, btnHeight)
         let num0View = UIView(frame: num0ViewFrame)
         num0View.tag = 0
         let num0Label = UILabel(frame: CGRectMake(0,0,num0ViewFrame.width,num0ViewFrame.height))
@@ -84,7 +102,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // .的视图添加
         let curpX = 1 + btnWidth
         let curpY = 1 + 3 * btnHeight
-        let numpViewFrame = CGRectMake(curpX, curpY, btnWidth - 1, btnHeight - 1)
+        let numpViewFrame = CGRectMake(curpX, curpY, btnWidth - 1, btnHeight)
         let numpView = UIView(frame: numpViewFrame)
         numpView.tag = -1
         let numpLabel = UILabel(frame: CGRectMake(0,0,numpViewFrame.width,numpViewFrame.height))
@@ -183,6 +201,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             if tempArray.count != 0{
                 symbolArray.removeLastObject()
                 symbolArray.addObject(sender.tag)
+                self.showSymbol(sender.tag)
             }
             return
         }
@@ -232,11 +251,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func calc(){
         var num = Double()
-        if let tempnum = Double.init(numTF.text!){
+        print(numTF.text!)
+        if let tempnum = Double.init(numTF.text!.stringByReplacingOccurrencesOfString(",", withString: "")){
             num = tempnum
         }
         tempArray.addObject(Double(num))
         numTF.text = nil
+        if tempArray.count == symbolArray.count{
+            symbolArray.removeLastObject()
+        }
         var arrayHasPrioritySymbol = false
         for symbol in symbolArray{
             let symbolInt = symbol.integerValue
@@ -302,6 +325,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }else{
             let result = tempArray[0]
             numTF.text = "\(result)"
+            showSymbol(-1)
             self.addComma()
             lastNumLabel.text = ""
             symbolTF.text = ""
