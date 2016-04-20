@@ -267,10 +267,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func deleteNum(){
         if let numText = numTF.text{
-            if numText.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "1234567890.")) != ""{
+            if numText.stringByTrimmingCharactersInSet(NSCharacterSet(charactersInString: "1234567890.,")) != ""{
                 numTF.text = ""
             }else{
                 numTF.text = String(numText.characters.dropLast(1))
+                addComma()
             }
         }
     }
