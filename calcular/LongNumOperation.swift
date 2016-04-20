@@ -106,3 +106,60 @@ func ++(left:String,right:String) -> String{
     }
     return resultstr
 }
+
+func *(left:String, right:String) -> String{
+    var resultstr = String()
+    //获取小数位数
+    var leftCount = 0
+    var rightCount = 0
+    if let leftIndex = left.characters.indexOf("."){
+        leftCount = leftIndex.distanceTo(left.endIndex) - 1
+    }
+    if let rightIndex = right.characters.indexOf("."){
+        rightCount = rightIndex.distanceTo(right.endIndex) - 1
+    }
+    let pCount = leftCount + rightCount
+    //移除小数点并添加到数组
+    let leftStr = left.stringByReplacingOccurrencesOfString(".", withString: "")
+    let rightStr = right.stringByReplacingOccurrencesOfString(".", withString: "")
+    var longArray = [Int]()
+    var shortArray = [Int]()
+    let resultArray = NSMutableArray()
+    for char in (leftStr.characters.count >= right.characters.count ? leftStr.characters : rightStr.characters){
+        longArray.insert(Int(String(char))!, atIndex: 0)
+    }
+    for char in (leftStr.characters.count < right.characters.count ? leftStr.characters : rightStr.characters){
+        shortArray.insert(Int(String(char))!, atIndex: 0)
+    }
+    for shortIndex in 0..<shortArray.count{
+        var tempCarry = 0
+        var tempArray = [Int]()
+        var tempStr = ""
+        for _ in 0..<shortIndex{
+            tempArray.append(0)
+            tempStr.insert(Character("0"), atIndex: tempStr.startIndex)
+        }
+        for longIndex in 0..<longArray.count{
+            var curResult = shortArray[shortIndex] * longArray[longIndex] + tempCarry
+            tempCarry = curResult/10
+            curResult = curResult%10
+            tempArray.append(curResult)
+            tempStr.insert(Character("\(curResult)"), atIndex: tempStr.startIndex)
+        }
+        if tempCarry != 0{
+            tempArray.append(tempCarry)
+            tempStr.insert(Character("\(tempCarry)"), atIndex: tempStr.startIndex)
+        }
+        resultArray.addObject(tempStr)
+    }
+    resultstr = resultArray[0] as! String
+    for index in 1..<resultArray.count{
+        resultstr = resultstr ++ (resultArray[index] as! String)
+    }
+    if pCount != 0{
+        resultstr.insert(".", atIndex: resultstr.endIndex.advancedBy(-pCount))
+    }
+    
+    
+    return resultstr
+}
