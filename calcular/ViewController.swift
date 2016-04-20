@@ -281,6 +281,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         print(numTF.text!)
         if let _ = Double.init(numTF.text!.stringByReplacingOccurrencesOfString(",", withString: "")){
             num = numTF.text!.stringByReplacingOccurrencesOfString(",", withString: "")
+            if num == ""{
+                num = "0"
+            }
+        }else{
+            num = "0"
         }
         tempArray.addObject(num)
         numTF.text = nil
