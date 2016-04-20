@@ -7,7 +7,7 @@
 //
 
 import Foundation
-//大数加法
+//大数加法Long Number Plus Method
 infix operator ++{
 associativity left precedence 140
 }
@@ -16,6 +16,8 @@ func ++(left:String,right:String) -> String{
     
     var leftstr = [String]()
     var rightstr = [String]()
+    //将数字分割成小数部分以及整数部分
+    //Separated the number into decimal part and integer part
     if left.containsString("."){
         leftstr = left.componentsSeparatedByString(".")
     }else{
@@ -26,10 +28,16 @@ func ++(left:String,right:String) -> String{
     }else{
         rightstr = [right]
     }
-    //处理小数部分
+    //处理小数部分    Deal the decimal number.
     //小数状态0代表左右都有小数部分，1代表左边有小数右边没，2代表右边有小数左边没，3代表两边都没有小数
+    /**
+     *  0:Either left number and right number both have the decimal part
+     *  1:Only left number has the decimal part
+     *  2:Only right number has the decimal part
+     *  3:Both sides do not have the decimal part.
+     */
     let decimalStatu = leftstr.count == 2 && rightstr.count == 2 ? 0 : (leftstr.count == 1 && rightstr.count == 1 ? 3 : leftstr.count == 2 && rightstr.count != 2 ? 1 : 2)
-    var decimalCanPlus1 = false
+    var decimalCanPlus1 = false//The value show the decimal part will full to integer part.一个显示小数位相加后是否可以使整数加1的状态值
     switch decimalStatu {
     case 0:
         resultstr.appendContentsOf(".")
@@ -46,6 +54,8 @@ func ++(left:String,right:String) -> String{
             resultstr.insert(Character(String(pstrlong[index])), atIndex: resultstr.startIndex.advancedBy(1))
         }
         for index in 0..<pstrshort.count{
+            //如果小数可以进位，则末位加1.只加一次
+            //If decimal part can full to integer part,integer last number plus 1,only plus once.
             var curResult = pstrlong[index] + pstrshort[index] + (decimalCanPlus1 ? 1 : 0)
             if curResult >= 10{
                 curResult -= 10
@@ -71,7 +81,7 @@ func ++(left:String,right:String) -> String{
     default:
         fatalError("decimalStatu can not detect two numbers statu")
     }
-    //处理整数部分
+    //处理整数部分    Deal with the integer part
     var leftarray = [Int]()
     for char in leftstr[0].characters{
         leftarray.insert(Int(String(char))!, atIndex: 0)
@@ -80,7 +90,11 @@ func ++(left:String,right:String) -> String{
     for char in rightstr[0].characters{
         rightarray.insert(Int(String(char))!, atIndex: 0)
     }
+    //较短数的数位
+    //The shorter number's count
     let minCount = leftarray.count>rightarray.count ? rightarray.count : leftarray.count
+    //数字相加后是否会进十的状态值
+    //After plusing , if the result greater than 10,this value turns true.
     var isGreaterThanTen = false
     for index in 0..<minCount{
         var curResult = leftarray[index] + rightarray[index] + (isGreaterThanTen ? 1 : 0) + (decimalCanPlus1 ? 1 : 0)
@@ -89,6 +103,8 @@ func ++(left:String,right:String) -> String{
         if isGreaterThanTen{curResult -= 10}
         resultstr.insert(Character(String(curResult)), atIndex: resultstr.startIndex)
     }
+    //指定较长的数，来完成短数位后的运算
+    //Continue calculate the value after finished the shortnumber dealing.
     let longArray = leftarray.count>rightarray.count ? leftarray : rightarray
     for index in minCount..<(longArray.count){
         var curResult = longArray[index]
@@ -101,6 +117,8 @@ func ++(left:String,right:String) -> String{
         }
         resultstr.insert(Character(String(curResult)), atIndex: resultstr.startIndex)
     }
+    //如果计算完毕后，仍会进十，则在首位加1
+    //if finished all the calculates,the result still can carrybit,then add 1 to the first position.
     if isGreaterThanTen{
         resultstr.insert("1", atIndex: resultstr.startIndex)
     }
@@ -110,6 +128,7 @@ func ++(left:String,right:String) -> String{
 func *(left:String, right:String) -> String{
     var resultstr = String()
     //获取小数位数
+    //get how many number of the decimal part.
     var leftCount = 0
     var rightCount = 0
     if let leftIndex = left.characters.indexOf("."){
@@ -120,6 +139,7 @@ func *(left:String, right:String) -> String{
     }
     let pCount = leftCount + rightCount
     //移除小数点并添加到数组
+    //remove the point(.) and add the number to array
     let leftStr = left.stringByReplacingOccurrencesOfString(".", withString: "")
     let rightStr = right.stringByReplacingOccurrencesOfString(".", withString: "")
     var longArray = [Int]()
@@ -131,10 +151,14 @@ func *(left:String, right:String) -> String{
     for char in (leftStr.characters.count < right.characters.count ? leftStr.characters : rightStr.characters){
         shortArray.insert(Int(String(char))!, atIndex: 0)
     }
+    //进行逐位乘法运算
+    //multiply number one by one.Like 1,234 * 12 = 1,234 * 1 * 10 + 1,234 * 2
     for shortIndex in 0..<shortArray.count{
         var tempCarry = 0
         var tempArray = [Int]()
         var tempStr = ""
+        //每位运算都在最后一位添加0
+        //Add 0 to last position when calculating.Like 1,234 * 1 * 10 = 12,340 * 1
         for _ in 0..<shortIndex{
             tempArray.append(0)
             tempStr.insert(Character("0"), atIndex: tempStr.startIndex)
@@ -152,6 +176,8 @@ func *(left:String, right:String) -> String{
         }
         resultArray.addObject(tempStr)
     }
+    //将乘法之后的结果相加起来
+    //Add all the multiply result
     resultstr = resultArray[0] as! String
     for index in 1..<resultArray.count{
         resultstr = resultstr ++ (resultArray[index] as! String)
