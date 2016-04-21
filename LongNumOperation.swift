@@ -8,6 +8,8 @@
 
 import Foundation
 //大数加法Long Number Plus Method
+//为了避免影响原生字符串拼接，使用++作为加法符号。
+//To avoid the original String connection,I use ++ as the plus operator.
 infix operator ++{
 associativity left precedence 140
 }
@@ -185,6 +187,13 @@ func *(left:String, right:String) -> String{
     if pCount != 0{
         resultstr.insert(".", atIndex: resultstr.endIndex.advancedBy(-pCount))
     }
+    
+    
+    return resultstr
+}
+
+func -(left:String, right:String) -> String{
+    var resultstr = String()
     
     
     return resultstr
