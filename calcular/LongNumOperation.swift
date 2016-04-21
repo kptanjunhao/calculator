@@ -248,16 +248,16 @@ func -(left:String,right:String) -> String{
             break
         }
     }
-    //如果结果是正数的减法
-    if resultIsPositive!{
+    
+    func reduce(statu: Bool){
         var frontNumWillSub1 = false
         //先算小数，正数情况下，小数状态有三种情况，0:两边都有，1:只有左边有，2:只有右边有
         if decimalStatu == 0{
             resultstr.appendContentsOf(".")
             //右边小数比较多
-            if shortCount == leftstr[1].characters.count{
+            if shortCount == leftDecArray.count{
                 var i = 1
-                for _ in shortCount..<rightstr[1].characters.count{
+                for _ in shortCount..<rightDecArray.count{
                     var curResult = 0 - rightDecArray[rightDecArray.count - i] - (frontNumWillSub1 ? 1 : 0)
                     if curResult < 0{
                         curResult += 10
@@ -271,7 +271,7 @@ func -(left:String,right:String) -> String{
                 
             }else{
                 //左边小数比较多
-                for index in shortCount..<leftstr[1].characters.count{
+                for index in shortCount..<leftDecArray.count{
                     
                     resultstr.insert(Character(String(leftDecArray[index])), atIndex: resultstr.endIndex)
                 }
@@ -286,15 +286,15 @@ func -(left:String,right:String) -> String{
                 }
                 resultstr.insert(Character(String(curResult)), atIndex: resultstr.startIndex.advancedBy(1))
             }
-        }else if decimalStatu == 1{
+        }else if decimalStatu == (statu ? 1 : 2){
             resultstr.appendContentsOf(".")
-            for curNum in leftstr[1].characters{
-                resultstr.append(curNum)
+            for curNum in leftDecArray{
+                resultstr.appendContentsOf("\(curNum)")
             }
-        }else if decimalStatu == 2{
+        }else if decimalStatu == (statu ? 2 : 1){
             resultstr.appendContentsOf(".")
             var i = 1
-            for _ in 0..<rightstr[1].characters.count{
+            for _ in 0..<rightDecArray.count{
                 var curResult = 0 - rightDecArray[rightDecArray.count - i] - (frontNumWillSub1 ? 1 : 0)
                 if curResult < 0{
                     curResult += 10
@@ -330,17 +330,33 @@ func -(left:String,right:String) -> String{
                 resultstr.insert(Character(String(curResult)), atIndex: resultstr.startIndex)
             }
         }
-        for index in 0..<resultstr.characters.count{
-            if resultstr.hasPrefix("0"){
+        var index = 0
+        for _ in 0..<resultstr.characters.count{
+            if resultstr.hasPrefix("0") && !resultstr.hasPrefix("0."){
                 resultstr.removeAtIndex(resultstr.startIndex.advancedBy(index))
+                index = 0
             }else{
                 break
             }
         }
+    }
+    func exchange(inout first:[Int],inout second:[Int]){
+        let temp = first
+        first = second
+        second = temp
+    }
+    
+    if resultIsPositive!{
+        //如果结果是正数的减法
+        reduce(resultIsPositive!)
     }else{
         //如果结果是负数的减法
-        
-        
+        print(leftDecArray)
+        exchange(&leftArray, second: &rightArray)
+        exchange(&leftDecArray, second: &rightDecArray)
+        print(leftDecArray)
+        reduce(resultIsPositive!)
+        resultstr.insert("-", atIndex: resultstr.startIndex)
     }
     
     

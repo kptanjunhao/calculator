@@ -333,8 +333,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     switch symbolInt {
                     case 2:
                         let index = symbolArray.indexOfObject(symbol)
-                        let first = tempArray[index].doubleValue
-                        let last = tempArray[index+1].doubleValue
+                        let first = tempArray[index] as! String
+                        let last = tempArray[index+1] as! String
                         tempArray[index] = first - last
                         tempArray.removeObjectAtIndex(index+1)
                         symbolArray.removeObjectAtIndex(index)
