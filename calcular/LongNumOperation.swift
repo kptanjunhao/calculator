@@ -13,7 +13,23 @@ import Foundation
 infix operator ++{
 associativity left precedence 140
 }
-func ++(left:String,right:String) -> String{
+func ++(leftS:String, rightS:String) -> String{
+    var left = leftS
+    var right = rightS
+    for _ in 0..<left.characters.count{
+        if left.hasPrefix("0") && !left.hasPrefix("0."){
+            left.removeAtIndex(left.startIndex)
+        }else{
+            break
+        }
+    }
+    for _ in 0..<right.characters.count{
+        if right.hasPrefix("0") && !right.hasPrefix("0."){
+            right.removeAtIndex(right.startIndex)
+        }else{
+            break
+        }
+    }
     var resultstr = String()
     
     var leftstr = [String]()
@@ -127,7 +143,23 @@ func ++(left:String,right:String) -> String{
     return resultstr
 }
 
-func -(left:String,right:String) -> String{
+func -(leftstr:String, rightstr:String) -> String{
+    var left = leftstr
+    var right = rightstr
+    for _ in 0..<left.characters.count{
+        if left.hasPrefix("0") && !left.hasPrefix("0."){
+            left.removeAtIndex(left.startIndex)
+        }else{
+            break
+        }
+    }
+    for _ in 0..<right.characters.count{
+        if right.hasPrefix("0") && !right.hasPrefix("0."){
+            right.removeAtIndex(right.startIndex)
+        }else{
+            break
+        }
+    }
     var resultstr = String()
     
     var leftstr = [String]()
@@ -362,7 +394,25 @@ func -(left:String,right:String) -> String{
 }
 
 //大数乘法，需要调用到大数加法，若使用请把大数加法同时复制过去
-func *(left:String, right:String) -> String{
+func *(leftstr:String, rightstr:String) -> String{
+    var left = leftstr
+    var right = rightstr
+    for _ in 0..<left.characters.count{
+        if left.hasPrefix("0") && !left.hasPrefix("0."){
+            left.removeAtIndex(left.startIndex)
+        }else{
+            break
+        }
+    }
+    for _ in 0..<right.characters.count{
+        if right.hasPrefix("0") && !right.hasPrefix("0."){
+            right.removeAtIndex(right.startIndex)
+        }else{
+            break
+        }
+    }
+    
+    
     var resultstr = String()
     //获取小数位数
     //get how many number of the decimal part.
@@ -430,15 +480,38 @@ func *(left:String, right:String) -> String{
 //大数除法，需要用到以上所有三则大数运算
 //字符串的大于、小于号的比较方法：从第一位起比较当前位置的ASCII码，如果相同则继续比较下一位，如果不同则直接返回不再比较后面的
 //利用此特性，可以先比较字符串的长度，长度相同则比较字符串，长度不同则比较长度。
-func /(left:String,right:String) -> String{
-    var resultstr = String()
-    for _ in left.characters{
-        resultstr.appendContentsOf("0")
+
+func /(leftS:String, rightS:String) -> String{
+    //暂时未添加小数处理
+    if leftS.containsString(".") || rightS.containsString("."){
+        return "\(Double(leftS)!/Double(rightS)!)"
     }
     
-    var leftstr = left
-    let rightstr = right
+    var leftstr = leftS
+    var rightstr = rightS
+    for _ in 0..<leftstr.characters.count{
+        if leftstr.hasPrefix("0") && !leftstr.hasPrefix("0."){
+            leftstr.removeAtIndex(leftstr.startIndex)
+        }else{
+            break
+        }
+    }
+    for _ in 0..<rightstr.characters.count{
+        if rightstr.hasPrefix("0") && !rightstr.hasPrefix("0."){
+            rightstr.removeAtIndex(rightstr.startIndex)
+        }else{
+            break
+        }
+    }
+    //－－－－－－－－－－－－－－暂时不出小数
+    if leftstr - rightstr < "0"{
+        return "0 remain " + rightstr
+    }
     
+    var resultstr = String()
+    for _ in leftstr.characters{
+        resultstr.appendContentsOf("0")
+    }
     var remainder = ""
     var whileCondition = true
     var index = rightstr.characters.count - 1
