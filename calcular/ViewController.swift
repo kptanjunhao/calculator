@@ -179,6 +179,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func addComma(){
         //防止最后一位是小数点时调用
         if numTF.text!.characters.last != "." && numTF.text!.characters.count != 0{
+            var remain = ""
+            if numTF.text!.containsString(" remain"){
+                let arry = numTF.text!.componentsSeparatedByString(" remain")
+                numTF.text = arry[0]
+                remain = " remain" + arry[1]
+            }
             //将整数与小数部分分隔开
             let resultfarr = numTF.text!.characters.split(".")
             var afterpoint = ""
@@ -202,7 +208,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 }
             }
             //整合整数部分与小数部分
-            numTF.text = numTF.text! + afterpoint
+            numTF.text = numTF.text! + afterpoint + remain
         }
     }
     
@@ -306,8 +312,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     switch symbolInt {
                     case 0:
                         let index = symbolArray.indexOfObject(symbol)
-                        let first = tempArray[index].doubleValue
-                        let last = tempArray[index+1].doubleValue
+                        let first = tempArray[index] as! String
+                        let last = tempArray[index+1] as! String
                         tempArray[index] = first / last
                         tempArray.removeObjectAtIndex(index+1)
                         symbolArray.removeObjectAtIndex(index)

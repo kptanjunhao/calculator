@@ -351,10 +351,8 @@ func -(left:String,right:String) -> String{
         reduce(resultIsPositive!)
     }else{
         //如果结果是负数的减法
-        print(leftDecArray)
         exchange(&leftArray, second: &rightArray)
         exchange(&leftDecArray, second: &rightDecArray)
-        print(leftDecArray)
         reduce(resultIsPositive!)
         resultstr.insert("-", atIndex: resultstr.startIndex)
     }
@@ -363,6 +361,7 @@ func -(left:String,right:String) -> String{
     return resultstr
 }
 
+//大数乘法，需要调用到大数加法，若使用请把大数加法同时复制过去
 func *(left:String, right:String) -> String{
     var resultstr = String()
     //获取小数位数
@@ -424,6 +423,74 @@ func *(left:String, right:String) -> String{
         resultstr.insert(".", atIndex: resultstr.endIndex.advancedBy(-pCount))
     }
     
+    
+    return resultstr
+}
+
+//大数除法，需要用到以上所有三则大数运算
+//字符串的大于、小于号的比较方法：从第一位起比较当前位置的ASCII码，如果相同则继续比较下一位，如果不同则直接返回不再比较后面的
+//利用此特性，可以先比较字符串的长度，长度相同则比较字符串，长度不同则比较长度。
+func /(left:String,right:String) -> String{
+    var resultstr = String()
+    for _ in left.characters{
+        resultstr.appendContentsOf("0")
+    }
+    
+    var leftstr = left
+    let rightstr = right
+    
+    var remainder = ""
+    var whileCondition = true
+    var index = rightstr.characters.count - 1
+    while whileCondition {
+        for _ in 0..<leftstr.characters.count{
+            if leftstr.hasPrefix("0"){
+                leftstr.removeAtIndex(leftstr.startIndex)
+                index += 1
+            }else{
+                break
+            }
+        }
+        var tempstr = leftstr.substringToIndex(rightstr.endIndex)
+        while tempstr - rightstr < "0"{
+            index += 1
+            tempstr += "0"
+            tempstr = leftstr.substringToIndex(tempstr.endIndex)
+        }
+        leftstr = leftstr.substringFromIndex(tempstr.endIndex)
+        var curResult = 0
+        for i in 1...9{
+            let temp = tempstr - rightstr
+            if temp >= "0"{
+                curResult = i
+                tempstr = temp
+            }else{
+                break
+            }
+        }
+        if tempstr == "0"{
+            tempstr = ""
+        }
+        resultstr.removeAtIndex(resultstr.startIndex.advancedBy(index))
+        resultstr.insert(Character("\(curResult)"), atIndex: resultstr.startIndex.advancedBy(index))
+        index += (rightstr.characters.count - tempstr.characters.count)
+        remainder = tempstr
+        leftstr = tempstr + leftstr
+        
+        whileCondition = leftstr.characters.count > rightstr.characters.count ||
+            (leftstr.characters.count == rightstr.characters.count && leftstr >= rightstr)
+    }
+    
+    for _ in resultstr.characters{
+        if resultstr.hasPrefix("0") && resultstr.characters.count != 1{
+            resultstr = resultstr.substringFromIndex(resultstr.startIndex.advancedBy(1))
+        }else{
+            break
+        }
+    }
+    if remainder != "" && remainder != "0"{
+        resultstr.appendContentsOf(" remain \(remainder)")
+    }
     
     return resultstr
 }
