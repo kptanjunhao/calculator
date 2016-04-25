@@ -51,6 +51,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tempArray = NSMutableArray()
         symbolArray = NSMutableArray()
         
+
         addKeyboard(CGRectMake(20, 100, self.view.frame.width-40, self.view.frame.height-200))
         self.view.addSubview(tableView)
     }
@@ -67,6 +68,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
+    /**
+     This method is to add a keyboard to Viewcontroller's view<br/>
+     使用此方法添加一个键盘到视图控制器的view上
+     - parameters:
+        - keyboardFrame: The keyboard's frame   键盘的frame
+     */
     func addKeyboard(keyboardFrame:CGRect){
         let keyboardView = UIView(frame: keyboardFrame)
         keyboardView.backgroundColor = UIColor.blackColor()

@@ -226,15 +226,16 @@ func -(leftstr:String, rightstr:String) -> String{
     }else if leftstr[0].characters.count == rightstr[0].characters.count{
         //如果整数位数相同，则遍历判断
         for index in 0..<leftArray.count{
-            if leftArray[index] == rightArray[index]{
+            if leftArray[leftArray.count-1-index] == rightArray[leftArray.count-1-index]{
                 continue
             }
-            if leftArray[index] > rightArray[index]{
+            if leftArray[leftArray.count-1-index] > rightArray[leftArray.count-1-index]{
                 resultIsPositive = true
                 break
             }
-            if leftArray[index] < rightArray[index]{
+            if leftArray[leftArray.count-1-index] < rightArray[leftArray.count-1-index]{
                 resultIsPositive = false
+                break
             }
         }
     }else{
@@ -472,7 +473,16 @@ func *(leftstr:String, rightstr:String) -> String{
     if pCount != 0{
         resultstr.insert(".", atIndex: resultstr.endIndex.advancedBy(-pCount))
     }
-    
+    for _ in resultstr.characters{
+        if resultstr.hasPrefix("0") && resultstr.characters.count != 1{
+            resultstr = resultstr.substringFromIndex(resultstr.startIndex.advancedBy(1))
+        }else{
+            break
+        }
+    }
+    if resultstr.hasPrefix("."){
+        resultstr.insert("0", atIndex: resultstr.startIndex)
+    }
     
     return resultstr
 }
@@ -483,12 +493,25 @@ func *(leftstr:String, rightstr:String) -> String{
 
 func /(leftS:String, rightS:String) -> String{
     //暂时未添加小数处理
-    if leftS.containsString(".") || rightS.containsString("."){
-        return "\(Double(leftS)!/Double(rightS)!)"
+    //    if leftS.containsString(".") || rightS.containsString("."){
+    //        return "\(Double(leftS)!/Double(rightS)!)"
+    //    }
+    
+    //首先算除数的小数位
+    var rightDecCount = 0
+    if rightS.containsString("."){
+        rightDecCount = rightS.characters.indexOf(Character("."))!.distanceTo(rightS.characters.endIndex) - 1
     }
     
-    var leftstr = leftS
-    var rightstr = rightS
+    var leftDecCount = 0
+    if leftS.containsString("."){
+        leftDecCount = leftS.characters.indexOf(Character("."))!.distanceTo(leftS.characters.endIndex) - 1
+    }
+    var resultDecCount = leftDecCount - rightDecCount
+    
+    
+    var leftstr = leftS.stringByReplacingOccurrencesOfString(".", withString: "")
+    var rightstr = rightS.stringByReplacingOccurrencesOfString(".", withString: "")
     for _ in 0..<leftstr.characters.count{
         if leftstr.hasPrefix("0") && !leftstr.hasPrefix("0."){
             leftstr.removeAtIndex(leftstr.startIndex)
@@ -561,9 +584,12 @@ func /(leftS:String, rightS:String) -> String{
             break
         }
     }
+    remainder.insert(Character("."), atIndex: resultstr.endIndex.advancedBy(-resultDecCount))
     if remainder != "" && remainder != "0"{
         resultstr.appendContentsOf(" remain \(remainder)")
     }
-    
+    if resultDecCount != 0{
+        resultstr.insert(Character("."), atIndex: resultstr.endIndex.advancedBy(-resultDecCount))
+    }
     return resultstr
 }
